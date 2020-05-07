@@ -1353,7 +1353,7 @@ class AudioMgr():
                     sql_stmt = \
                       ('INSERT INTO hebrew_audio(english, hebrew, audio_file, lesson_id)'
                        f' VALUES("{english_text}", "{hebrew_text}", "{audio_file_name}",'
-                       '{lesson_id} );')
+                       f'{lesson_id} );')
                 print(sql_stmt)
                 SQL.execute(sql_stmt)
                 SQLITE_DB.commit()
