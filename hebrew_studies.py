@@ -262,6 +262,7 @@ def search_audio_table(event=None):
         query = ('SELECT english, audio_id'
                  ' FROM hebrew_audio'
                  f' WHERE english LIKE "%{search}%"'
+                 f' OR hebrew LIKE "%{search}%"'
                  '  ORDER BY english;')
         print(query)
         try:
@@ -1132,7 +1133,8 @@ class AudioMgr():
                                         textvariable=self.total_words,
                                         fg=FG_RECORDS, bg=BG_COLOR)
 
-
+        #<h2 id="audiocbo">		Audio list combobox</h2>
+      
         #------- Audio list combobox
         self.audio_list = self.get_audio_list()
         self.selected_audio = tk.StringVar()
@@ -1983,6 +1985,22 @@ class AudioMgr():
             return lessons
         except sqlite3.Error as err:
             display_sql_error(err, query)
+   
+
+    #_____________________________________
+    #             is_hebrew
+    #_____________________________________
+    def is_hebrew(self, string):
+        """
+           Returns True if string contains one or more
+          Hebrew characters
+        """
+        if bool(re.search('[\u0590-\u05FF]+', string)) or \
+           bool(re.search('[\uFB1D-\uFB4F]+', string)):
+            return True
+        else:
+            return False
+   
 
     #_____________________________________
     #             play_audio
