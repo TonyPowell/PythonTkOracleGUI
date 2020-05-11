@@ -143,7 +143,7 @@ def clear_text(widget):
 #_____________________________________
 def contains_text(string):
     """
-     Verifies a string contains one or more alpha-numeric
+cate     Verifies a string contains one or more alpha-numeric
     characters whether the text is English or Hebrew
     """
     return bool(re.search('[a-zA-Z0-9]+', string)) or \
@@ -219,6 +219,8 @@ def display_sql_error(err, sql_stmt):
            f'In SQL Statement:\n {sql_stmt}')
     messagebox.showerror(title=title, message=msg)
 
+   
+
 #_____________________________________
 #           search_audio_table
 #_____________________________________
@@ -240,7 +242,7 @@ def search_audio_table(event=None):
         widget.selection_clear()
     else:
         search = widget.get()
-
+        
     #  If the widget is a combobox it may contain
     # text followed by a '|' and its ID.
     #  Just get the text and remove all leading
@@ -382,7 +384,8 @@ def search_website(event=None):
 
     #  If the text being searched for on the Doitinhebrew website
     # is not Hebrew then switch to its English webpage
-    if website_id == 'd' and search_source != AUDIO_MGR_HEBREW_TEXT:
+    #if website_id == 'd' and search_source != AUDIO_MGR_HEBREW_TEXT:
+    if website_id == 'd' and bool(re.search('[a-zA-Z]+', search_string)):
         webpage = ('https://www.doitinhebrew.com/Translate/'
                    'Default.aspx?l1=en&l2=iw&s=1&txt=')
 
@@ -415,7 +418,9 @@ def search_website(event=None):
                 widget.selection_clear()
             if bool(re.match(r'.* \|.*', search_string)):
                 string_list = search_string.split('|')
-                search_string = string_list[0].strip()
+                
+        if audio_mgr.is_hebrew(search_string):
+            search_string = audio_mgr.remove_niqqud(search_string) 
 
         #  Launch the selected webpage
         #  No search string is passed to the Lexilogos
@@ -916,7 +921,6 @@ class WebMgr():
         except sqlite3.Error as err:
             display_sql_error(err, query)
 
-
     #_____________________________________
     #           refresh_topics
     #_____________________________________
@@ -1351,6 +1355,9 @@ class AudioMgr():
                                     f" WHERE name ='{lesson_name}';")
                         SQL.execute(sql_stmt)
                         row = SQL.fetchone()
+                        #  Since a new lesson was created add it
+                        # to the Lesson dropdown list.
+                        self.lessons_cbo['values'] = self.get_lessons()
                     lesson_id = row['lesson_id']
                     sql_stmt = \
                       ('INSERT INTO hebrew_audio(english, hebrew, audio_file, lesson_id)'
@@ -1608,8 +1615,8 @@ class AudioMgr():
                         if err.args[0].find('no such table') > -1:
                             create_table = (f'CREATE TABLE {category_table} '
                                             ' (audio_id INTEGER PRIMARY KEY,'
-                                            ' FOREIGN KEY (audio_id) '
-                                            ' REFERENCES hebrew_audio(audio_id));')
+                                            '  FOREIGN KEY (audio_id)'
+                                            '  REFERENCES hebrew_audio(audio_id));')
 
                             print(create_table)
                             SQL.execute(create_table)
@@ -1621,7 +1628,7 @@ class AudioMgr():
                 else:
                     title = 'Database Successfully Updated'
                     msg = (f"Added '{english}' AUDIO_ID {audio_id}"
-                           " to category: {category_table}")
+                           f" to category: {category_table}")
                     messagebox.showinfo(title=title, message=msg)
                     self.category_cbo['values'] = self.get_categories()
                     self.category_lbl.configure(fg=FG_A_MEMBER)
@@ -1985,18 +1992,17 @@ class AudioMgr():
             return lessons
         except sqlite3.Error as err:
             display_sql_error(err, query)
-   
 
     #_____________________________________
-    #             is_hebrew
+    #           is_hebrew
     #_____________________________________
     def is_hebrew(self, string):
         """
-           Returns True if string contains one or more
-          Hebrew characters
+          If the string contains just one Hebrew character
+         the assumption is that it's Hebrew text.
         """
-        if bool(re.search('[\u0590-\u05FF]+', string)) or \
-           bool(re.search('[\uFB1D-\uFB4F]+', string)):
+        if  bool(re.search('[\u0590-\u05FF]+', string)) or \
+            bool(re.search('[\uFB1D-\uFB4F]+', string)):
             return True
         else:
             return False
@@ -2058,6 +2064,26 @@ class AudioMgr():
         if not active_query:
             self.audio_list_cbo.current(0)
             self.audio_list_cbo.event_generate("<<ComboboxSelected>>")
+
+    #_____________________________________
+    #           remove_niqqud
+    #_____________________________________
+    def remove_niqqud(self, string):
+        """
+          Removes all the diacritical vowel marks from the Hebrew text.
+         Oddly enough, in the case of some websites, including the niqqud
+         doesn't enhance the accurracy of the search but actually throws
+         it off.
+        """
+        niqqud = ['\u05B0','\u05B1','\u05B2','\u05B3','\u05B4',
+                  '\u05B5','\u05B6','\u05B7','\u05B8','\u05B9',
+                  '\u05BA','\u05BB','\u05BC','\u05BD']
+
+        for n in niqqud:
+           string = string.replace(n,'')
+        
+        print(string)  
+        return string.strip()
 
     #_____________________________________
     #        remove_plural
