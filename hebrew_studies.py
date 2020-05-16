@@ -847,7 +847,7 @@ class WebMgr():
             elif option.startswith('Link'):
                 current_audio = audio_mgr.audio_list_cbo.get().split('|')
                 audio_id = current_audio[1].strip()
-                sql_stmt = ("INSERT INTO audio_url(audio_id, url_id) "
+                sql_stmt = ("INSERT INTO audio_url_link(audio_id, url_id) "
                             f" VALUES('{audio_id}','{url_id}');")
                 SQL.execute(sql_stmt)
                 SQLITE_DB.commit()
@@ -855,7 +855,7 @@ class WebMgr():
             elif option.startswith('Remove'):
                 current_audio = audio_mgr.audio_list_cbo.get().split('|')
                 audio_id = current_audio[1].strip()
-                sql_stmt = (" DELETE FROM audio_url"
+                sql_stmt = (" DELETE FROM audio_url_link"
                             f" WHERE audio_id = '{audio_id}'"
                             f"  AND url_id = '{url_id}';")
                 SQL.execute(sql_stmt)
@@ -1726,15 +1726,15 @@ class AudioMgr():
     #_____________________________________
     def get_associated_webpages(self, audio_keywords, audio_id):
         """
-            Retrieves the URL IDs from the AUDIO_URL table that are
-           associated with the AUDIO_ID of the English keyword or
-           phrase displayed in the Audio combobox
+            Retrieves the URL IDs from the AUDIO_URL_LINK table that
+            are associated with the AUDIO_ID of the English keyword
+            or phrase displayed in the Audio combobox
         """
         query = ("SELECT topic, url_id "
                  "FROM webpage"
                  " WHERE url_id IN"
                  "      (SELECT url_id"
-                 "       FROM audio_url"
+                 "       FROM audio_url_link"
                  f"      WHERE audio_id = '{audio_id}')"
                  " ORDER BY topic;")
         print(query)
@@ -1863,6 +1863,8 @@ class AudioMgr():
         #  Get the widget that triggered the event
         # and its text
         widget = event.widget
+        print('###################################')
+        print(f'from  {widget.whoami} --> {widget.get()}')
         selection = widget.get().split('|')
         audio_keywords = selection[0].strip()
         audio_id = selection[1].strip()
