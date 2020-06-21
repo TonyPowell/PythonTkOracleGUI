@@ -320,9 +320,13 @@ def search_webpage_table(event=None):
     if contains_text(search):
         if widget.whoami == AUDIO_MGR_AUDIO_CBO:
             web_mgr.webpage_search.set(search)
+        if search.find('%') > -1:
+            where_clause = f" WHERE topic LIKE '{search}'"
+        else:    
+            where_clause = f" WHERE topic LIKE '%{search}%'"
         query = ("SELECT topic, url_id"
                  "  FROM webpage "
-                 f" WHERE topic LIKE '%{search}%'"
+                 f"  {where_clause}"
                  "  ORDER BY topic;")
         print(query)
         try:
@@ -707,6 +711,7 @@ class WebMgr():
 
 
         tip = (' Hit <ENTER> to query database topics for search text.\n '
+               "Default is %search text%, entering '%' overides the default.\n"    
                ' <Control-d> to search Doitinhebrew.com for the\n'
                'Hebrew translation of the English search text.')
         tool_tip.bind_widget(self.search_webpage_entry, balloonmsg=tip)
@@ -1620,7 +1625,7 @@ class AudioMgr():
 
                             print(create_table)
                             SQL.execute(create_table)
-                            SQL.execute(f"INSERT INTO category VALUES('category_table');")
+                            SQL.execute(f"INSERT INTO category VALUES('{category_table}');")
                             SQL.execute(sql_stmt)
                             SQLITE_DB.commit()
                 except sqlite3.Error as err:
@@ -1772,6 +1777,7 @@ class AudioMgr():
                      ' FROM hebrew_audio '
                      ' ORDER BY english;')
         try:
+            print(f'Executing SQL:\n {query}')
             SQL.execute(query)
             self.active_audio_query = query
             return ['{english}      | {audio_id}'.format(**row)
