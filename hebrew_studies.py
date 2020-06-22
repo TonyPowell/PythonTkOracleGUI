@@ -2081,16 +2081,23 @@ class AudioMgr():
           Removes all the diacritical vowel marks from the Hebrew text.
          Oddly enough, in the case of some websites, including the niqqud
          doesn't enhance the accurracy of the search but actually throws
-         it off.
+         it off. The search either fails or returns some really weird results.
         """
         niqqud = ['\u05B0','\u05B1','\u05B2','\u05B3','\u05B4',
                   '\u05B5','\u05B6','\u05B7','\u05B8','\u05B9',
-                  '\u05BA','\u05BB','\u05BC','\u05BD']
+                  '\u05BA','\u05BB','\u05BC','\u05BD','\u05C1',
+                  '\u05C2','\u05C4','\u05C5']
 
         for n in niqqud:
            string = string.replace(n,'')
+
+        # Also replace "שׁ" and "שׂ" with a "ש" which has no dot.
+        shin_sin = ["שׁ", "שׂ"]
+        for s in shin_sin:
+            string = string.replace(s,"ש")
+            
+        print(string)
         
-        print(string)  
         return string.strip()
 
     #_____________________________________
