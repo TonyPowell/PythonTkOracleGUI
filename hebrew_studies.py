@@ -16,12 +16,22 @@ import sqlite3
 import webbrowser
 import urllib
 import os
+import sys
+import io
 import re
+import inspect
 import pygame
+
+DEBUG = True
+IDLE = ''
 
 # Set screen constants
 WIN_HEIGHT = 650
 WIN_WIDTH = 780
+SQL_WIN_HEIGHT=320
+SQL_WIN_WIDTH=700
+BG_HLIST = '#cce6ff'
+FG_HLIST = 'black'
 BG_COLOR = '#669999'
 FG_COLOR = '#ffffcc'
 FG_RECORDS = '#ccffff'
@@ -58,6 +68,7 @@ SQL = SQLITE_DB.cursor()
 # their referents in the main function.
 text_editor_menu = ''
 tool_tip = ''
+color = ''
 url_mgr = ''
 web_mgr = ''
 audio_mgr = ''
@@ -80,9 +91,11 @@ def main():
     # or tkinter widgets.
     global text_editor_menu
     global tool_tip
+    global color
     global url_mgr
     global web_mgr
     global audio_mgr
+    global IDLE
 
     # Configure the screen
     main_win = tix.Tk()
@@ -106,6 +119,24 @@ def main():
                       ' background  #ffff99'
     tool_tip = tix.Balloon(main_win, options=balloon_options)
 
+    #  When using the IDLE IDE to write and debug Python code,
+    # run the following to display output messages in different
+    # colors.
+    #  The options associated with the various colors are: BUILTIN,
+    # COMMENT, DEFINITION, ERROR, KEYWORD, STRING, SYNC,, TODO,
+    # console, hit, sel, stdin, stderr and stdout.
+    #  For example,
+    # color.write("This is the color for KEYWORD\n", "KEYWORD")
+    if 'idlelib' in sys.modules:
+        IDLE = True
+        try:
+            color = sys.stdout.shell
+            color.write("Running the IDLE IDE.\n", "KEYWORD")
+        except:
+            print("Couldn't initialize output colors.")
+    else:
+        IDLE = False
+
     # Launch the application
     url_mgr = UrlMgr(main_win)
     web_mgr = WebMgr(main_win)
@@ -118,6 +149,7 @@ def main():
 #           Define the functions ahared by the classes
 #####################################################################
 
+
 #_____________________________________
 #            clear_text
 #_____________________________________
@@ -126,9 +158,13 @@ def clear_text(widget):
         Deletes all the text displayed in the widget
        that envoked the pop_up text editor.
     """
+    current_function = sys._getframe().f_code.co_name
+    display_function(current_function)
+
 
     widget.delete(0, 'end')
-    print(f'Widget = {widget.whoami}')
+    if DEBUG:
+        print(f'Widget = {widget.whoami}')
     #  If the text being cleared is either the Lessons or Category
     # comboboxes change the color of their labels to indicate that
     # the currently displayed audio file is not a member of a blank
@@ -182,6 +218,75 @@ def create_hyperlink(event=None):
         messagebox.showerror(title=title, message=msg)
 
 #_____________________________________
+#            display_function
+#_____________________________________
+def display_function(name):
+    """
+       Displays what function is running. Used
+      for tracing program flow.
+    """
+    global IDLE
+    
+    if DEBUG: 
+        msg = f'>>>>> Running {name} '  
+    if IDLE:
+        color.write(f'{msg}\n', "hit")
+    else:
+        print(msg)
+
+#_____________________________________
+#    display_function_completion
+#_____________________________________
+def display_function_completion(name):
+    """
+       Displays when function has finished. 
+      Used for tracing program flow.
+    """
+    global IDLE
+    
+    if DEBUG: 
+        msg = f'<<<<< Exiting {name} '  
+    if IDLE:
+        color.write(f'{msg}\n', "sel")
+    else:
+        print(msg)
+
+#_____________________________________
+#            display_sql
+#_____________________________________
+def display_sql(function, sql_stmt):
+    """
+       Displays the pending SQL statement and the 
+      function executing it.
+    """
+
+    msg = f'{function} '.upper() +\
+          'executing the following SQL statement:\n'
+           
+    print('####################################################')
+    if IDLE:
+        color.write(f'{msg}', "KEYWORD")
+        color.write(f'{sql_stmt}\n', "STRING")
+    else:
+        print(f'{msg} {sql_stmt}')   
+    print('####################################################')
+  
+
+#_____________________________________
+#           display_sql_error
+#_____________________________________
+def display_sql_error(err, sql_stmt, function=None):
+    """
+        Displays the SQL statement and the error it generated.
+    """
+    title = 'SQLite3 Error'
+    msg = (f'SQL Error Message generated in {function}: \n\n'
+           f'      {err.args[0]} \n\n'
+           f'In SQL Statement:\n {sql_stmt}')
+    messagebox.showerror(title=title, message=msg)
+
+
+#_____________________________________
 #        display_text_editor_menu
 #_____________________________________
 def display_text_editor_menu(event):
@@ -206,20 +311,6 @@ def display_text_editor_menu(event):
 
     text_editor_menu.tk.call("tk_popup", text_editor_menu, event.x_root, event.y_root)
 
-#_____________________________________
-#           display_sql_error
-#_____________________________________
-def display_sql_error(err, sql_stmt):
-    """
-        Displays the SQL statement and the error it generated.
-    """
-    title = 'SQLite3 Error'
-    msg = ('SQL Error Message: \n'
-           f'      {err.args[0]} \n\n'
-           f'In SQL Statement:\n {sql_stmt}')
-    messagebox.showerror(title=title, message=msg)
-
-   
 
 #_____________________________________
 #           search_audio_table
@@ -230,6 +321,9 @@ def search_audio_table(event=None):
      records matching the text in the triggering widget and
      populates the Audio list combobox with the results.
     """
+    if DEBUG:
+        current_function = sys._getframe().f_code.co_name
+        display_function(current_function)
 
     # Get the widget that triggered the event
     widget = event.widget
@@ -247,8 +341,7 @@ def search_audio_table(event=None):
     # text followed by a '|' and its ID.
     #  Just get the text and remove all leading
     # and following spaces
-    if bool(re.match(r'.* \|.*', search)):
-        print('found |')
+    if bool(re.match(r'.* \|.*', search)): 
         selection = search.split('|')
         search = selection[0].strip()
 
@@ -266,7 +359,8 @@ def search_audio_table(event=None):
                  f' WHERE english LIKE "%{search}%"'
                  f' OR hebrew LIKE "%{search}%"'
                  '  ORDER BY english;')
-        print(query)
+        if DEBUG:
+            display_sql(current_function, query)
         try:
             SQL.execute(query)
             audio_mgr.active_audio_query = query
@@ -283,12 +377,14 @@ def search_audio_table(event=None):
                 msg = f"Query returned no results matching\n '{search}'"
                 messagebox.showerror(title=title, message=msg)
         except sqlite3.Error as err:
-            display_sql_error(err, query)
+            display_sql_error(err, query, current_function)
     else:
         title = 'Nothing to Search'
         msg = f'No text entered in the \n{widget.whoami}.'
         messagebox.showerror(title=title, message=msg)
-
+        
+    if DEBUG:
+        display_function_completion(current_function)
 #_____________________________________
 #       search_webpage_table
 #_____________________________________
@@ -298,6 +394,9 @@ def search_webpage_table(event=None):
      TOPIC column that match the text entered in the triggering
      widget and populates the Topics combobox with the results.
     """
+    if DEBUG:
+        current_function = sys._getframe().f_code.co_name
+        display_function(current_function)
 
     #  Check for any selected text in the widget that
     # triggered the event and use that text for the
@@ -310,8 +409,8 @@ def search_webpage_table(event=None):
     else:
         search = widget.get()
         search = search.split('|')[0].strip()
-
-    print(f'>>> Searching for {search}')
+    if DEBUG:
+        print(f'>>> Searching for {search}')
     #  Make sure the widget actually contains text before querying
     # the database.
     #  If the triggering widget is the AudioMgr Topics combobox set
@@ -328,7 +427,9 @@ def search_webpage_table(event=None):
                  "  FROM webpage "
                  f"  {where_clause}"
                  "  ORDER BY topic;")
-        print(query)
+        if DEBUG:
+            display_sql(current_function, query)
+        
         try:
             SQL.execute(query)
             topics = ['{topic}      | {url_id}'.format(**row)
@@ -353,6 +454,9 @@ def search_webpage_table(event=None):
         msg = f'No text found in \n{widget.whoami}'
         messagebox.showerror(title=title, message=msg)
 
+    if DEBUG:
+        display_function_completion(current_function)
+
 #_____________________________________
 #           search_website
 #_____________________________________
@@ -364,7 +468,10 @@ def search_website(event=None):
       Doitinhebrew.com can also be searched for English words and
       phrases to get their Hebrew translations.
     """
-
+    if DEBUG:
+        current_function = sys._getframe().f_code.co_name
+        display_function(current_function)
+    
     #  Get the widget that triggered the event and its displayed text.
     #  The widget's whoami attribute identifies the widget that triggered
     # the event and determines how to process the text before passing
@@ -396,8 +503,10 @@ def search_website(event=None):
 
     # Process the text before passing it to the url
     #
-    print(f'>>>>> search_string = {search_string} website ID = {website_id}')
-    print(contains_text(search_string))
+    if DEBUG:
+        print(f'>>>>> search_string = {search_string} website ID = {website_id}')
+        print(contains_text(search_string))
+    
     if contains_text(search_string):
         if search_source == AUDIO_MGR_HEBREW_TEXT:
             # Strip off the gender if found.
@@ -418,14 +527,19 @@ def search_website(event=None):
         else:
             if widget.selection_present():
                 search_string = widget.selection_get()
-                print(f'selected text = {search_string}')
+                if DEBUG:
+                    print(f'selected text = {search_string}')
                 widget.selection_clear()
             if bool(re.match(r'.* \|.*', search_string)):
                 string_list = search_string.split('|')
                 
         if audio_mgr.is_hebrew(search_string):
-            search_string = audio_mgr.remove_niqqud(search_string) 
-
+            search_string = audio_mgr.remove_niqqud(search_string)
+            
+        # Remove punctuation marks   
+        for p in ['.', '!', '?']:
+            search_string = search_string.replace(p,'')
+                
         #  Launch the selected webpage
         #  No search string is passed to the Lexilogos
         # websites. Don't know how.
@@ -436,12 +550,16 @@ def search_website(event=None):
             webpage = webpage + search_string
             if website_id == 'f':
                 webpage = webpage + '/he/'
-            print(f"Searching {webpage} \n")
+            if DEBUG:
+                print(f"Searching {webpage} \n")
             webbrowser.open_new(webpage)
     else:
         title = 'Nothing to search'
         msg = f'No text found in {search_source}'
         messagebox.showerror(title=title, message=msg)
+
+    if DEBUG:
+        display_function_completion(current_function)
 
 #####################################################################
 #                        Define the Classes
@@ -565,6 +683,10 @@ class UrlMgr():
            Gets the displayed website name, topic and URL
           and inserts the data into the database WEBPAGE table.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+        
         #  Make sure the necessary data, i.e. the topic and URL,
         # are entered before proceeding
         topic = self.topic.get()
@@ -574,19 +696,23 @@ class UrlMgr():
             try:
                 sql_stmt = ('INSERT INTO webpage(topic, url)'
                             f' VALUES("{topic}","{url}");')
-                print(sql_stmt)
+                if DEBUG:
+                    display_sql(current_function, sql_stmt)
+
                 SQL.execute(sql_stmt)
                 SQLITE_DB.commit()
                 title = 'URL Added to Database'
                 msg = f"Successfully executed following SQL:\n {sql_stmt}"
                 messagebox.showinfo(title=title, message=msg)
             except sqlite3.Error as err:
-                display_sql_error(err, sql_stmt)
+                display_sql_error(err, sql_stmt, current_function)
         else:
             title = 'Insufficient Data'
             msg = 'The URL and Topic fields must contain data.'
             messagebox.showerror(title=title, message=msg)
 
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #            decode_url_percent
@@ -596,6 +722,7 @@ class UrlMgr():
            Decodes the Hebrew characters in an URL that are percent encoded
           so that they appear as Hebrew characters.
         """
+
         decoded_url = urllib.parse.unquote(self.url.get())
         self.url.set(decoded_url)
 
@@ -608,6 +735,11 @@ class UrlMgr():
            Retrieves the names of the websites from the database table
           WEBSITES and populates the Websites combo box.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+
+        
         try:
             query = 'SELECT name FROM website ORDER BY name;'
             SQL.execute(query)
@@ -821,6 +953,10 @@ class WebMgr():
            Unlinks the displayed webpage from the audio
           displayed in Audio frame.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+        
         self.webpage_options.set("Options")
         current_topic = self.topics_cbo.get()
         url = self.db_url.get()
@@ -868,13 +1004,16 @@ class WebMgr():
                 reset_index = False
             if reset_index:
                 current_index = self.topic_index.get()
-                print(f'>>> Current index={current_index}')
+                if DEBUG:
+                    print(f'>>> Current index={current_index}')
                 self.refresh_topics()
                 self.topics_cbo.current(current_index)
                 self.topics_cbo.event_generate("<<ComboboxSelected>>")
         except sqlite3.Error as err:
             display_sql_error(err, sql_stmt)
 
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #            get_topics
@@ -884,11 +1023,18 @@ class WebMgr():
            Retrieves the values from the TOPIC and URL_ID columns
           of the WEBPAGE table to populate the Topics combo box.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+
+        
         try:
             query = ('SELECT topic, url_id '
                      ' FROM webpage '
                      ' ORDER BY topic;')
             SQL.execute(query)
+            if DEBUG:
+                display_function_completion(current_function)
             return ['{topic}      | {url_id}'.format(**row)
                     for row in SQL.fetchall()]
         except sqlite3.Error as err:
@@ -904,7 +1050,11 @@ class WebMgr():
          from the WEBPAGE table for the specified url_id in the
          Topics combobox and displays it in the URL entry box.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
 
+        
         widget = event.widget
         selection = widget.get().split('|')
         url_id = selection[1].strip()
@@ -913,19 +1063,23 @@ class WebMgr():
                  ' FROM webpage'
                  f' WHERE url_id = {url_id};')
 
-        print('Executing url query:')
-        print(query)
+        if DEBUG:
+            display_sql(current_function, query)
+    
         try:
             SQL.execute(query)
             row = SQL.fetchone()
             self.db_url.set(row['url'])
             #self.db_website.set(row['website_id'])
-            print(f'Query returned : url={self.db_url.get()}')
+            if DEBUG:
+                print(f'{current_function} query returned : url={self.db_url.get()}')
             current = self.topics_cbo.current() + 1
             self.total_topics.set(f'#{current} of  {len(self.topics_cbo["values"])}')
         except sqlite3.Error as err:
             display_sql_error(err, query)
-
+            
+        if DEBUG:
+            display_function_completion(current_function)
     #_____________________________________
     #           refresh_topics
     #_____________________________________
@@ -935,7 +1089,10 @@ class WebMgr():
          of the WEBPAGE table and populates the Topics combobox with
          the results.
         """
-        print('Refreshing topics')
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)        
+        
         #  Clear out the current entries in the Webpage widgets before
         # refreshing the data
         self.db_url_entry.delete(0, 'end')
@@ -948,6 +1105,9 @@ class WebMgr():
         #self.total_topics.set(f'Total {len(self.topics_cbo["values"])}')
         self.topics_cbo.event_generate("<<ComboboxSelected>>")
 
+        if DEBUG:
+            display_function_completion(current_function)
+
 
 #====================================================================
 #                           AudioMgr
@@ -955,7 +1115,8 @@ class WebMgr():
 class AudioMgr():
     """
         Adds Hebrew audio files and their corresponding Hebrew
-       text and English translations to the database.
+       text and English translations to the database. Retrieves
+       and searches for database entries.
     """
     def __init__(self, main):
         #  Intialize the Pygame mixer to
@@ -1110,6 +1271,9 @@ class AudioMgr():
         self.lesson_audio_optmnu = tk.OptionMenu(self.audio_frame, self.lesson_options,
                                                  "Add displayed audio to Lesson",
                                                  "Remove displayed audio from Lesson",
+                                                 "Lesson vocabulary list",
+                                                 "Lesson study sheet in Hebrew",
+                                                 "Lesson study sheet in English",
                                                  command=self.execute_lesson_option)
         self.lesson_audio_optmnu.configure(fg=FG_COLOR, bg=BG_COLOR,
                                            activebackground=BG_COLOR)
@@ -1241,11 +1405,19 @@ class AudioMgr():
         self.category_audio_optmnu = tk.OptionMenu(self.audio_frame, self.category_options,
                                                    "Add displayed audio to Category",
                                                    "Remove displayed audio from Category",
+                                                   "Category vocabulary list",
+                                                   "Category study sheet in Hebrew",
+                                                   "Category study sheet in English",
                                                    command=self.execute_category_option)
         self.category_audio_optmnu.configure(fg=FG_COLOR, bg=BG_COLOR,
                                              activebackground=BG_COLOR)
         self.category_audio_optmnu["menu"].config(fg=FG_COLOR, bg=BG_COLOR)
 
+
+        #--- SQL button
+        self.connect_to_db_btn = tk.Button(self.audio_frame,text = "Connect\nto DB ",
+                                 fg=FG_COLOR,bg=BG_COLOR,
+                                 command = self.display_sql_window)      
 
         #=========== Arrange the widgets on the screen ==============
         # Audio frame
@@ -1292,7 +1464,7 @@ class AudioMgr():
         # add_remove_audio_to_lesson  button
         tk.Label(self.audio_frame, text='Audio / Lesson',
                  fg=FG_COLOR, bg=BG_COLOR).place(relx=.84, y=3)
-        self.lesson_audio_optmnu.place(relx=.8475, y=28)
+        self.lesson_audio_optmnu.place(relx=.8475, y=27)
 
         # Category combobox
         self.category_lbl.place(relx=.57, y=130)
@@ -1309,7 +1481,11 @@ class AudioMgr():
         self.new_english_entry.place(x=15, y=155, relwidth=.25)
 
         # Add_audio_to_DB button
-        self.add_audio_to_db_btn.place(relx=.29, y=135)
+        self.add_audio_to_db_btn.place(relx=.28, y=135)
+
+        # SQL button
+        self.connect_to_db_btn.place(relx=.4625, y=135)
+
 
     #_____________________________________
     #       add_audio_to_db
@@ -1321,6 +1497,10 @@ class AudioMgr():
          Also adds the audio to the whatever lesson ,if any, is
         displayed in the Lesson combobox.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+        
         #  Retrieve the contents of all the widgets whose data are
         # necessary to populate the HEBREW_AUDIO table and insure
         # that they actually contain text.
@@ -1368,7 +1548,10 @@ class AudioMgr():
                       ('INSERT INTO hebrew_audio(english, hebrew, audio_file, lesson_id)'
                        f' VALUES("{english_text}", "{hebrew_text}", "{audio_file_name}",'
                        f'{lesson_id} );')
-                print(sql_stmt)
+                    
+                if DEBUG:
+                    display_sql(current_function, sql_stmt)
+                 
                 SQL.execute(sql_stmt)
                 SQLITE_DB.commit()
                 title = 'Audio Data Added to Database'
@@ -1376,8 +1559,17 @@ class AudioMgr():
                 messagebox.showinfo(title=title, message=msg)
                 #  Refresh the audio list so that the newly
                 # added audio will appear in the list.
-                #  Set the currently audio to the new audio.
+                if DEBUG:
+                    msg = (f'Following query passed to refresh_audio function:\n '
+                           '{self.active_audio_query}')
+                    print('###############################################')
+                    if IDLE:
+                        color.write(f'{msg}\n', "KEYWORD")
+                    else:
+                        print(msg)
+                    print('###############################################')
                 self.refresh_audio(self.active_audio_query)
+                #  Set the current audio to the new audio.
                 for i, audio in enumerate(self.audio_list_cbo['values']):
                     audio_item = audio.split('|')
                     audio_text = audio_item[0].strip()
@@ -1391,6 +1583,9 @@ class AudioMgr():
             msg = ('The English for New Audio, Hebrew and '
                    'Audio File fields must contain data.')
             messagebox.showerror(title=title, message=msg)
+            
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #       clear_current_audio
@@ -1403,9 +1598,178 @@ class AudioMgr():
           preparation for creating a new entry to insert into
           the database HEBREW_AUDIO table.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+
         self.hebrew_text.delete(0, 'end')
         self.audio_file_entry.delete(0, 'end')
         self.audio_list_cbo.set('')
+
+        if DEBUG:
+            display_function_completion(current_function)
+
+
+
+    #_____________________________________
+    #      create_html_study_sheet 
+    #_____________________________________
+    def create_html_study_sheet(self, **study_subjects):
+        """
+           Creates an html file consisting of an alphabetical
+          list of the Hebrew and their English translations
+          in the lesson's vocabulary
+        """
+        if DEBUG:
+                current_function = sys._getframe().f_code.co_name
+                display_function(current_function)
+    
+        if 'language' in study_subjects:
+            language = study_subjects['language']
+        else:
+            language = 'English, Hebrew'
+            
+        if 'lesson' in study_subjects:
+            lesson = study_subjects['lesson']
+            study_title = lesson.replace(' ', ' Lesson ')
+        else:
+            lesson = None
+               
+        if 'category' in study_subjects:
+            category = study_subjects['category']
+            study_title = category
+        else:
+            category = None
+            
+        
+        print(f'Study title = {study_title}')
+        test_template = \
+        ('<!DOCTYPE html>\n'
+         '<html lang="en">\n'
+         '<head>\n'
+         '   <meta charset = "UTF-8">\n'
+         f'   <title>{study_title}</title> \n'
+         '       <link rel="stylesheet" type="text/css" href="hebrew.css"> \n'
+         '   </style> \n'
+         '</head> \n'
+         '<body> \n'
+         f'   <h2 class="lesson_header"> {study_title} </h2> \n'
+         f'<a href="Ha-yesod-verbs.html" target="_blank">Ha-Yesod Verbs</a> <br>\n'
+         f'<a href="grammar_verbs.html" target="_blank">Verb Conjugation</a> \n'
+         f'<h4> {language} Vocabulary:</h4> \n'
+         '<table > \n'
+         '<colgroup> \n'
+         '<col  style="text-align: left;"> \n'
+         '<col  style="text-align: right;" > \n'
+         '</colgroup> \n'
+         '<tbody> \n')
+
+        if lesson:
+            study_sheet = f"{HEBREW_MEDIA}{lesson.replace(' ', '_')}_study_sheet.html"
+            print(f'Creating lesson test {study_sheet}')
+        elif category:
+            category = category.replace(' ', '_')
+            study_sheet = f"{HEBREW_MEDIA}{category}_study_sheet.html"
+
+        #niqqud = False
+        if language == 'Hebrew':
+            msg = f"Retain niqqud?"
+            if messagebox.askyesno('Verify', msg, icon='warning'):
+                niqqud = True
+            else:
+                niqqud = False        
+        try:
+            with io.open(study_sheet ,'w', encoding='utf8') as study_file:
+                study_file.write(test_template)
+                if lesson:
+                    sql_stmt = (f'SELECT {language}, audio_file FROM hebrew_audio \n'
+                                '  WHERE lesson_id = \n'
+                                '   (SELECT lesson_id FROM lesson \n'
+                                f'    WHERE name = "{lesson}")  \n'  
+                                f' ORDER BY {language};')
+                elif category:
+                    sql_stmt = (f'SELECT {language}, audio_file FROM hebrew_audio \n'
+                                '  WHERE audio_id IN \n'
+                                f'   (SELECT audio_id FROM {category}) \n'  
+                                f' ORDER BY {language};')
+                    
+                print(sql_stmt)
+                SQL.execute(sql_stmt)
+
+                row_num = 0
+                for row in SQL.fetchall():
+                    if language == 'English, Hebrew':
+                        row_num += 1
+                        study_file.write('<tr> \n')
+                        study_file.write(f'<td class="english_text">&nbsp &nbsp {row[0]}</td> \n')
+                        audio_id = f'audio_{row_num}'
+                        if row[2] == 'No Audio':
+                            audio_found = False
+                            cursor_icon = 'no-drop'
+                        else:
+                            audio_found = True
+                            cursor_icon = 'pointer'
+                        study_file.write(f'<td class="hebrew_text {cursor_icon}" onclick="play(\'{audio_id}\')">&nbsp {row[1]}</td> \n')
+                        if audio_found:
+                            study_file.write(f'<audio id="{audio_id}" src="{row[2]}"></audio> \n')
+                        study_file.write('</tr> \n')
+                    else:
+                        text = row[0].strip()              
+                        if language == 'Hebrew':
+                            if not niqqud:
+                                text = self.remove_niqqud(text)
+                            input_class = 'english_input'
+                            translation = 'hebrew_text' 
+                        else:
+                            input_class = 'hebrew_input'
+                            translation = 'english_text'
+                         
+                        # Color the background of every other row's
+                        # translation text light blue
+                        row_num += 1
+                        if row_num & 1 == 1:
+                            row_class = 'row_odd'
+                        else:
+                            row_class = 'row_even'
+                            
+                        audio_id = f'audio_{row_num}'
+                        if row[1] == 'No Audio':
+                            audio_found = False
+                            cursor_icon = 'no-drop'
+                        else:
+                            audio_found = True
+                            cursor_icon = 'pointer'
+                        study_file.write('<tr> \n')                
+                        study_file.write((f'<td><input type="text" class="{input_class}" '
+                                     ' name="comment" value=" "></td> \n'))
+                        study_file.write((f'<td class="{translation} {row_class} {cursor_icon}" onclick="play(\'{audio_id}\')">'
+                                          f'&nbsp &nbsp {text}</td> \n'))
+                        if audio_found:
+                            study_file.write(f'<audio id="{audio_id}" src="{row[1]}"></audio> \n')                                                  
+                        study_file.write('</tr> \n')
+                        
+                study_file.write("</tbody> \n")
+                study_file.write("</table> \n")
+                if language != 'english, hebrew':                  
+                    study_file.write(f'<script src="hebrew.js" ></script> \n')
+                    study_file.write(('<script> \n'	
+                                     'let elements = document.getElementsByClassName("hebrew_input"); \n'		
+                                     'for (var i = 0; i < elements.length; i++) {  \n'
+                                     '    elements[i].addEventListener("keyup", convertTextToHebrew, false); \n'
+                                     '} \n'
+                                     '</script> \n'))
+                study_file.write("</tbody> \n") 
+                study_file.write("</body> \n")
+                study_file.write("</html> \n")
+
+            webbrowser.open_new(study_sheet)
+                    
+        except sqlite3.Error as err:
+            display_sql_error(err, sql_stmt)
+
+        if DEBUG:
+            display_function_completion(current_function)
+
 
     #_____________________________________
     #       display_lesson_webpage
@@ -1415,13 +1779,16 @@ class AudioMgr():
           Envokes the web browser to display the webpage
          of the lesson displayed in the Lesson combobox.
         """
-        print(f'lesson = {self.lesson.get()}')
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
 
         webpage = self.lesson.get()
         if webpage:
             webpage = HEBREW_MEDIA + webpage.replace(' ', '_') +'.html'
             if os.path.exists(webpage):
-                print(f'webpage={webpage}')
+                if DEBUG:
+                    print(f'webpage={webpage}')
                 webbrowser.open_new(webpage)
             else:
                 msg = f'Webpage NOT found:\n {webpage}.'
@@ -1429,6 +1796,10 @@ class AudioMgr():
         else:
             msg = "No URL entry"
             messagebox.showinfo('No Web Page', msg)
+
+        if DEBUG:
+            display_function_completion(current_function)
+
 
     #_____________________________________
     #        display_webpage_menu
@@ -1438,7 +1809,10 @@ class AudioMgr():
          Displays the webpage pop-up menu at the widget
         that invoked it and launches the selected webpage.
         """
-
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+        
         widget = event.widget
         widget.focus_set()
 
@@ -1492,6 +1866,68 @@ class AudioMgr():
 
         self.website_menu.tk.call("tk_popup", self.website_menu, event.x_root, event.y_root)
 
+        if DEBUG:
+            display_function_completion(current_function)
+
+    #_______________________________________________________________________________    
+    #                       display_sql_window  
+    #_______________________________________________________________________________      
+    def display_sql_window(self):
+        """
+          Displays a tkinter Toplevel widget allowing entering
+         SQL statements, envoking a SQLite3 shell and displaying
+         table definitions.
+        """
+        
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+            
+        sql_win = tk.Toplevel()   
+        sql_text = tk.Text(sql_win, height=7, width=50)    
+        sql_win.geometry(("%dx%d" % (SQL_WIN_WIDTH, SQL_WIN_HEIGHT)))
+        sql_win.title('Enter SQL Query') 
+        sql_win.option_add('*Font', 'Helvetica 12')
+        sql_win.configure(background=BG_COLOR)
+        sql_query_text = tk.Text(sql_win, height=12, width=74)
+        sql_query_text.focus_set()
+
+        #--- DB button
+        database_btn = tk.Button(sql_win,text = "DB",
+                                fg=FG_COLOR,bg=BG_COLOR,
+                                 command = lambda: os.system(f'sqlite3.exe {HEBREW_DB}'))
+
+        #--- run SQL button
+        run_sql_btn = tk.Button(sql_win,text = "Run SQL",
+                                fg=FG_COLOR,bg=BG_COLOR,
+                                command = lambda: self.run_sql(sql_query_text.get("1.0",'end-1c')))
+        
+        tables = "SELECT name, sql FROM sqlite_master WHERE type='table';" 
+        tables_btn = tk.Button(sql_win,text = "Tables",
+                                fg=FG_COLOR,bg=BG_COLOR, 
+                                command = lambda: self.run_sql(tables))
+
+        if DEBUG:
+            display_function_completion(current_function)
+
+
+    
+        #====================================================================
+        #_-_-_-_-_-_-_-_- Arrange the widgets on the screen -_-_-_-_-_-_-_-_
+        #====================================================================
+        
+        tk.Label(sql_win, text='Enter SQL Query:',
+                  fg=FG_COLOR,bg=BG_COLOR).place(x=12,y=10)
+        sql_query_text.place(x = 12, y = 33)
+        
+        run_sql_btn.place(x = 300, y = 270)
+        
+        tables_btn.place(x = 620, y = 270)
+
+        database_btn.place(x = 570, y = 270)
+        
+        sql_win.mainloop()
+
     #_____________________________________
     #       execute_audio_option
     #_____________________________________
@@ -1502,6 +1938,9 @@ class AudioMgr():
          list combox, the Hebrew and audio_file entry boxes for the displayed
          Audio ID or removes the audio file data from the database.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
 
         self.audio_options.set("Options")
         selected_audio = self.selected_audio.get()
@@ -1544,8 +1983,9 @@ class AudioMgr():
                 # reflects the database changes and set the combobox back to where it was.
                 # If an item was deleted then the item below it will be displayed.
                 current_index = self.audio_index.get()
-                print('========================================================')
-                print('Index of {current_index} in query \n{self.active_audio_query}')
+                if DEBUG:
+                    print('========================================================')
+                    print('Index of {current_index} in query \n{self.active_audio_query}')
                 self.refresh_audio(self.active_audio_query)
                 self.audio_list_cbo.current(current_index)
 
@@ -1554,6 +1994,9 @@ class AudioMgr():
                 self.audio_list_cbo.event_generate("<<ComboboxSelected>>")
         except sqlite3.Error as err:
             display_sql_error(err, sql_stmt)
+
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #    execute_category_option
@@ -1564,6 +2007,9 @@ class AudioMgr():
           displayed in the Category combobox. An Audio ID
           can be a member of multiple categories.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
 
         #  Before proceeding make sure an audio has been selected
         # and the category combobox contains text that was either
@@ -1582,6 +2028,18 @@ class AudioMgr():
             title = 'No Category Entered'
             msg = 'Nothing selected or entered in the Category combo box.'
             messagebox.showerror(title=title, message=msg)
+        elif option.startswith('Category'): 
+            if bool(re.search('vocabulary', option)):
+                #self.create_lesson_vocabulary_sheet(lesson_name)
+                language = 'English, Hebrew'
+                self.create_html_study_sheet(category=category_name)
+            else:
+                if bool(re.search('Hebrew', option)):
+                    language = 'Hebrew'
+                else:
+                    language = 'English'
+                self.create_html_study_sheet(category=category_name,
+                                        language=language)
         elif option.startswith('Remove') and \
                  self.category_lbl["foreground"] == FG_NOT_A_MEMBER:
             title = 'Removal Unnecessary.'
@@ -1589,7 +2047,8 @@ class AudioMgr():
             messagebox.showerror(title=title, message=msg)
         else:
             selection = selected_audio.split('|')
-            print(selection)
+            if DEBUG:
+                print(selection)
             english = selection[0].strip()
             audio_id = selection[1].strip()
             category_table = category_name.replace(' ', '_')
@@ -1622,8 +2081,9 @@ class AudioMgr():
                                             ' (audio_id INTEGER PRIMARY KEY,'
                                             '  FOREIGN KEY (audio_id)'
                                             '  REFERENCES hebrew_audio(audio_id));')
+                            if DEBUG:
+                                display_sql(current_function, create_table)
 
-                            print(create_table)
                             SQL.execute(create_table)
                             SQL.execute(f"INSERT INTO category VALUES('{category_table}');")
                             SQL.execute(sql_stmt)
@@ -1637,6 +2097,9 @@ class AudioMgr():
                     messagebox.showinfo(title=title, message=msg)
                     self.category_cbo['values'] = self.get_categories()
                     self.category_lbl.configure(fg=FG_A_MEMBER)
+
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #    execute_lesson_option
@@ -1655,6 +2118,9 @@ class AudioMgr():
           it's LESSON_ID column. So actually, the lesson is added to
           the audio and not vice versa.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
 
         #  Make sure an audio file has been selected.
         #  Any selected audio will have the format
@@ -1679,6 +2145,19 @@ class AudioMgr():
             title = 'Removal Unnecessary.'
             msg = f"Lesson '{lesson_name}' doesn't include Audio '{selected_audio}'."
             messagebox.showerror(title=title, message=msg)
+        elif option.startswith('Lesson'): 
+            if bool(re.search('vocabulary', option)):
+                #self.create_lesson_vocabulary_sheet(lesson_name)
+                language = 'English, Hebrew'
+                self.create_html_study_sheet(lesson=lesson_name)
+            else:
+                if bool(re.search('Hebrew', option)):
+                    language = 'Hebrew'
+                else:
+                    language = 'English'
+                self.create_html_study_sheet(lesson=lesson_name,
+                                               language=language)
+                #self.create_lesson_test_sheet(lesson_name, language)
         else:
             selection = selected_audio.split('|')
             english = selection[0].strip()
@@ -1706,7 +2185,9 @@ class AudioMgr():
                                 "    FROM lesson"
                                 f"   WHERE name ='{lesson_name}') "
                                 f"WHERE audio_id = {audio_id};")
-                print(sql_stmt)
+                if DEBUG:
+                    display_sql(current_function, sql_stmt)
+
                 SQL.execute(sql_stmt)
                 SQLITE_DB.commit()
                 title = 'Database Successfully Updated'
@@ -1726,6 +2207,9 @@ class AudioMgr():
             except sqlite3.Error as err:
                 display_sql_error(err, sql_stmt)
 
+        if DEBUG:
+            display_function_completion(current_function)
+
     #_____________________________________
     #       get_associated_webpages
     #_____________________________________
@@ -1735,6 +2219,11 @@ class AudioMgr():
             are associated with the AUDIO_ID of the English keyword
             or phrase displayed in the Audio combobox
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+
+        
         query = ("SELECT topic, url_id "
                  "FROM webpage"
                  " WHERE url_id IN"
@@ -1742,12 +2231,15 @@ class AudioMgr():
                  "       FROM audio_url_link"
                  f"      WHERE audio_id = '{audio_id}')"
                  " ORDER BY topic;")
-        print(query)
+        if DEBUG:
+            display_sql(current_function, query)
+
         try:
             SQL.execute(query)
             topics = ['{topic}      | {url_id}'.format(**row)
                       for row in SQL.fetchall()]
-            print(f"Associated topics = {topics}")
+            if DEBUG:
+                print(f"Associated topics = {topics}")
             if len(topics) > 0:
                 web_mgr.topics_cbo['values'] = topics
                 web_mgr.topics_cbo.set(topics[0])
@@ -1761,6 +2253,9 @@ class AudioMgr():
         except sqlite3.Error as err:
             display_sql_error(err, query)
 
+        if DEBUG:
+            display_function_completion(current_function)
+
     #_____________________________________
     #         get_audio_list
     #_____________________________________
@@ -1769,7 +2264,10 @@ class AudioMgr():
             Queries the ENGLISH and AUDIO_ID columns of the database
            table HEBREW_AUDIO to populate the Audio list combo box.
         """
-
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+        
         if active_query:
             query = active_query
         else:
@@ -1777,13 +2275,20 @@ class AudioMgr():
                      ' FROM hebrew_audio '
                      ' ORDER BY english;')
         try:
-            print(f'Executing SQL:\n {query}')
+            if DEBUG:
+                display_sql(current_function, query)
+
             SQL.execute(query)
             self.active_audio_query = query
+            if DEBUG:
+                display_function_completion(current_function)
             return ['{english}      | {audio_id}'.format(**row)
                     for row in SQL.fetchall()]
         except sqlite3.Error as err:
             display_sql_error(err, query)
+
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #           get_categories
@@ -1793,6 +2298,9 @@ class AudioMgr():
            Retrieves the values from the NAME column of the
           CATEGORY table to populate the category combo box.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
 
         sql_stmt = \
         """
@@ -1802,9 +2310,14 @@ class AudioMgr():
         """
         try:
             SQL.execute(sql_stmt)
+            if DEBUG:
+                display_function_completion(current_function)
             return [row['name'] for row in SQL.fetchall()]
         except sqlite3.Error as err:
             display_sql_error(err, sql_stmt)
+
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #        get_category_members
@@ -1815,6 +2328,9 @@ class AudioMgr():
          list of all the AUDIO_IDs in the associated category table and populates
          the Audio list combo box with the results.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
 
         # Get the widget that triggered the event and its displayed text.
         widget = event.widget
@@ -1830,14 +2346,20 @@ class AudioMgr():
                  f" FROM hebrew_audio ha, {category_table} ct"
                  "   WHERE ha.audio_id = ct.audio_id"
                  "   ORDER BY english;")
-        print(query)
+        if DEBUG:
+            display_sql(current_function, query)
+
         self.search_audio_entry.delete(0, 'end')
         try:
             SQL.execute(query)
             self.active_audio_query = query
             audio_list = ['{english}      | {audio_id}'.format(**row)
                           for row in SQL.fetchall()]
-            print(audio_list)
+            # The number_keys function is needed only on
+            #the numbers category
+            if category_table == 'numbers':
+                audio_list.sort(key=audio_mgr.number_keys)
+            #print(audio_list)
             #  If any matching results were found populate the Audio combobox
             # otherwise display an error
             if len(audio_list) > 0:
@@ -1856,6 +2378,9 @@ class AudioMgr():
         except sqlite3.Error as err:
             display_sql_error(err, query)
 
+        if DEBUG:
+            display_function_completion(current_function)
+
     #_____________________________________
     #            get_hebrew
     #_____________________________________
@@ -1866,29 +2391,44 @@ class AudioMgr():
            of the HEBREW_AUDIO table to populate the Hebrew and Audio File
            entry boxes and the Lessons combobox entry field.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+            
         #  Get the widget that triggered the event
         # and its text
         widget = event.widget
-        print('###################################')
-        print(f'from  {widget.whoami} --> {widget.get()}')
-        selection = widget.get().split('|')
-        audio_keywords = selection[0].strip()
-        audio_id = selection[1].strip()
+        
+        if DEBUG:
+            print('###################################')
+            msg = f'Processing "{widget.get()}" from "{widget.whoami}"'
+            if IDLE:
+                color.write(f"{msg}\n", "KEYWORD")
+            else:
+                print(msg)
+                
+        current_audio = widget.get().split('|')
+        audio_keywords = current_audio[0].strip()
+        audio_id = current_audio[1].strip()
 
         self.audio_index.set(widget.current())
-        print('###################################')
-        print(f'Current index = {widget.current()}')
+        if DEBUG:
+            print('###################################')
+            print(f'Current index = {widget.current()}')
 
         sql_stmt = ('SELECT hebrew, audio_file, lesson_id '
                     ' FROM hebrew_audio '
                     f' WHERE audio_id = {audio_id};')
-
-        print('Executing  query:')
-        print(sql_stmt)
+        
+        if DEBUG:
+            display_sql(current_function, sql_stmt)
         try:
             SQL.execute(sql_stmt)
             row = SQL.fetchone()
-            print(f'Row = {row}')
+            if DEBUG:
+                print(f'Audio ID {audio_id} returned:')
+                for column in ['hebrew', 'audio_file', 'lesson_id']:
+                    print(f'\t{column} = ', row[column])
             self.hebrew.set(row['hebrew'])
             self.audio_file.set(row['audio_file'])
 
@@ -1907,35 +2447,46 @@ class AudioMgr():
                 self.lesson.set(row['name'])
             self.new_english.set('')
             category_table = self.category.get()
-            print(f'Category table = {category_table}')
+            if DEBUG:
+                print(f'Category table = {category_table}')
             if len(category_table) > 0:
                 category_table = self.category.get().replace(' ', '_')
                 sql_stmt = (f"SELECT audio_id FROM {category_table}"
                             f" WHERE audio_id = '{audio_id}';")
-                print(f'SQL = {sql_stmt}')
+                if DEBUG:
+                    display_sql(current_function, sql_stmt)
+
                 SQL.execute(sql_stmt)
                 row = SQL.fetchone()
                 if row:
-                    print(f"Found {row['audio_id']}")
+                    if DEBUG:
+                        print(f"Found {row['audio_id']}")
                     self.category_lbl.configure(fg=FG_A_MEMBER)
                 else:
                     self.category_lbl.configure(fg=FG_NOT_A_MEMBER)
             current_word = widget.current() + 1
             max_words = len(widget['values'])
             self.total_words.set(f'#{current_word} of {max_words}')
-
+            if DEBUG:
+                print('###################################')
+                msg = f'{current_function} calling get_associated_webpages'
+                if IDLE:
+                    color.write(f"{msg}\n", "STRING")
+                else:
+                    print(msg)           
             self.get_associated_webpages(audio_keywords, audio_id)
-
 
         except sqlite3.Error as err:
             display_sql_error(err, sql_stmt)
 
+        # if hebrew_in_category(audio_id, category.get()):
+        #     pass
 
-       # if hebrew_in_category(audio_id, category.get()):
-       #     pass
-        print(f'Query returned : hebrew={self.hebrew.get()} '
-              f'audio_file={self.audio_file.get()}')
-
+        if DEBUG:
+            print(f'{current_function} query returned : hebrew={self.hebrew.get()} '
+                  f'audio_file={self.audio_file.get()}')
+            display_function_completion(current_function)
+            
     #_____________________________________
     #             get_lesson
     #_____________________________________
@@ -1945,6 +2496,9 @@ class AudioMgr():
           LESSON column of the WEBPAGE table that matches that lesson
           and populates the Audio list combo box with the results.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
 
         # Get the widget that triggered the event and its displayed text.
         widget = event.widget
@@ -1954,19 +2508,22 @@ class AudioMgr():
                  f" WHERE l.name = '{lesson}'"
                  "   AND ha.lesson_id = l.lesson_id"
                  " ORDER BY english;")
-        print(query)
+        if DEBUG:
+            display_sql(current_function, query)
+
         self.search_audio_entry.delete(0, 'end')
         try:
             SQL.execute(query)
             audio_list = ['{english}      | {audio_id}'.format(**row)
                           for row in SQL.fetchall()]
-            print(audio_list)
+            if DEBUG:
+                print(audio_list)
             #  If any matching results were found populate the Audio combobox
             # otherwise display an error
             if len(audio_list) > 0:
                 self.active_audio_query = query
-
-                print(f'get_lesson Active audio query = {self.active_audio_query}')
+                if DEBUG:
+                    print(f'{current_function} Active audio query = {self.active_audio_query}')
                 self.audio_list_cbo['values'] = audio_list
                 self.audio_list_cbo.current(0)
                 self.audio_list_cbo.event_generate("<<ComboboxSelected>>")
@@ -1976,6 +2533,9 @@ class AudioMgr():
                 messagebox.showerror(title=title, message=msg)
         except sqlite3.Error as err:
             display_sql_error(err, query)
+            
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #             get_lessons
@@ -1985,6 +2545,9 @@ class AudioMgr():
             Retrieves the values from the LESSON column of the
            HEBREW_AUDIO table to populate the lessons combo box.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
 
         query = \
         """
@@ -1997,9 +2560,14 @@ class AudioMgr():
             lessons = [row['name'] for row in SQL.fetchall()]
             # Sort the Ha-yesod lessons by the lesson number
             lessons.sort(key=lambda x: float(x.strip('Ha-yesod')))
+            if DEBUG:
+                display_function_completion(current_function)
             return lessons
         except sqlite3.Error as err:
             display_sql_error(err, query)
+
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #           is_hebrew
@@ -2009,12 +2577,33 @@ class AudioMgr():
           If the string contains just one Hebrew character
          the assumption is that it's Hebrew text.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+
+        
         if  bool(re.search('[\u0590-\u05FF]+', string)) or \
             bool(re.search('[\uFB1D-\uFB4F]+', string)):
             return True
         else:
             return False
-   
+
+        if DEBUG:
+            display_function_completion(current_function)
+
+    #_____________________________________
+    #           number_keys
+    #_____________________________________
+    """
+      Generates the keys that are used to sort strings
+     that contain numbers(integers) and letters
+    """
+    
+    def number_keys(self, text):
+        def int_or_string(text): 
+            return int(text) if text.isdigit() else text
+        return [int_or_string(c) for c in re.split(r'(\d+)', text)]   
+
 
     #_____________________________________
     #             play_audio
@@ -2024,13 +2613,18 @@ class AudioMgr():
            Plays the audio of the file displayed in the audio file entry box. The
            audio file must be in the folder specified by the HEBREW_MEDIA constant.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+            
         audio = self.audio_file.get()
 
         if bool(re.match('.*.mp3', audio)) or \
            bool(re.match('.*.wav', audio)):
             try:
                 hebrew_audio = HEBREW_MEDIA + audio
-                print(hebrew_audio)
+                if DEBUG:
+                    print(f'Playing {hebrew_audio}')
                 clock = pygame.time.Clock()
                 pygame.mixer.music.load(hebrew_audio)
                 pygame.mixer.music.play()
@@ -2042,9 +2636,12 @@ class AudioMgr():
                 msg = f'Error Message:\n {err.args[0]}'
                 messagebox.showerror(title=title, message=msg)
             except Exception as err:
-                title = 'Play_Audio Function Error'
+                title = f'{current_function} Function Error'
                 msg = f'Error Message:\n {err.args[0]}'
                 messagebox.showerror(title=title, message=msg)
+
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #        refresh_audio
@@ -2056,13 +2653,29 @@ class AudioMgr():
           If there is no active_query argument then all the values
          in the HEBREW_AUDIO table will be returned.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+
         # Clear those widgets that aren't normally overwritten
         # by refreshing the Audio combobox
         self.new_english_entry.delete(0, 'end')
-        print(f'refresh_audio Active audio query = {active_query}')
-
+ 
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            called_function = 'get_audio_list'
+            msg = (f'{current_function} '
+                   f'sending following query to {called_function}:\n '
+                   f'{active_query}')
+            print('####################################################')
+            if IDLE:
+                color.write(f'{msg}\n', "KEYWORD")
+            else:
+                print(msg)      
+            print('####################################################')        
         # Re-populate the Audio combobox
         self.audio_list_cbo['values'] = self.get_audio_list(active_query)
+        
         #  In case the active query was a search that returned 1 item and
         # the next command was to delete that item, just retrieve all the
         # items from the audio database.
@@ -2073,6 +2686,22 @@ class AudioMgr():
             self.audio_list_cbo.current(0)
             self.audio_list_cbo.event_generate("<<ComboboxSelected>>")
 
+        if DEBUG:
+            display_function_completion(current_function)
+
+    #_____________________________________
+    #           remove_gender
+    #_____________________________________
+    def remove_gender(self, string):
+        last_letter = len(string) -1
+        if string[last_letter] == 'ז' and \
+           string[last_letter - 1] == ' ':
+            string = string.rstrip('ז')
+        elif string[last_letter] == 'נ' and \
+             string[last_letter - 1] == ' ':
+            string = string.rstrip('נ')
+        return string.strip()
+                
     #_____________________________________
     #           remove_niqqud
     #_____________________________________
@@ -2083,6 +2712,10 @@ class AudioMgr():
          doesn't enhance the accurracy of the search but actually throws
          it off. The search either fails or returns some really weird results.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+        
         niqqud = ['\u05B0','\u05B1','\u05B2','\u05B3','\u05B4',
                   '\u05B5','\u05B6','\u05B7','\u05B8','\u05B9',
                   '\u05BA','\u05BB','\u05BC','\u05BD','\u05C1',
@@ -2091,14 +2724,25 @@ class AudioMgr():
         for n in niqqud:
            string = string.replace(n,'')
 
-        # Also replace "שׁ" and "שׂ" with a "ש" which has no dot.
-        shin_sin = ["שׁ", "שׂ"]
-        for s in shin_sin:
-            string = string.replace(s,"ש")
-            
-        print(string)
+        # Also replace "שׁ" and "שׂ" with a "ש" which has no dot
+        # and "כּ" with "כ" and "פּ" with "פּ"
+        string = string.replace("שׁ","ש")
+        string = string.replace("שׂ","ש")
+        string = string.replace("כּ","כ")
+        string = string.replace("בּ","ב")
+        string = string.replace("פּ","פ")
+        
+        # Don't know why it doesn't delete the dot from a vav
+        # with a holam or a shuruk so make sure it's replaced.
+        string = string.replace("וֹ","ו")
+        string = string.replace("וּ","ו")
+        if DEBUG:
+            print(string)
         
         return string.strip()
+
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #        remove_plural
@@ -2115,38 +2759,129 @@ class AudioMgr():
           right parentheses, I test for all possibilities,
           i.e. (*), (*(, )*).
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+        
         # Left parenthesis search
         pl = re.compile(r'\(')
         # Right parenthesis search
         pr = re.compile(r'\)')
 
-        print('Searching for and removing plurals.')
+        
         pls = pl.search(hebrew)
         prs = pr.search(hebrew)
         if pls:
-            print(f"hebrew = '{hebrew}'")
-            print(f"Found left parenthesis '{pls.group()}'")
+            if DEBUG:
+                print(f"hebrew = '{hebrew}'")
+                print(f"Found left parenthesis '{pls.group()}'")
             if prs:
-                print(f"Found right parenthesis '{prs.group()}'")
+                if DEBUG:
+                    print(f"Found right parenthesis '{prs.group()}'")
                 search = re.sub(r'\(.*\)', '', hebrew)
                 search = search.strip()
-                print(f"Edit results: '{search}'")
+                if DEBUG:
+                    print(f"Edit results: '{search}'")
                 return search
             else:
                 search = re.sub(r'\(.*\(', '', hebrew)
                 search = search.strip()
-                print(f"Edit results: '{search}'")
+                if DEBUG:
+                    print(f"Edit results: '{search}'")
                 return search
         elif prs:
-            print(f"hebrew = '{hebrew}'")
-            print(f"Found right parenthesis '{prs.group()}'")
+            if DEBUG:
+                print(f"hebrew = '{hebrew}'")
+                print(f"Found right parenthesis '{prs.group()}'")
             search = re.sub(r'\).*\)', '', hebrew) #r'\([^)]*\
             search = re.sub(r'(.*?)\s?\).*?\)', r'\1', hebrew)
             search = search.strip()
-            print(f"Edit results: '{search}'")
+            if DEBUG:
+                print(f"Edit results: '{search}'")
             return search
         else:
             return hebrew.strip()
+
+        if DEBUG:
+            display_function_completion(current_function)
+
+
+    #_______________________________________________________________________________    
+    #                                run_sql  
+    #_______________________________________________________________________________  
+
+    def run_sql(self, sql_stmt):
+        """
+            Executes the SQL statement passed to it.
+        """
+        
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+        
+
+         
+        print(sql_stmt)
+        try:
+            SQL.execute(sql_stmt)
+            rows =  SQL.fetchall()
+            if len(rows) > 0:
+                result_win = tix.Tk()
+                result_win.geometry(("%dx%d" % (1050,600)))
+
+                columns = rows[0].keys()
+                print('columns = {}'.format(columns))
+                #columns = ['ID','Amount','Debit Date','Store','Receipt', 'Bill', 'Check Number','Check Cleared Date']  
+                total_columns = len(columns)
+                hlist_options = 'hlist.width 100 hlist.height 30' +  \
+                    ' hlist.font -adobe-helvetica-bold-r-narrow--12-120' + \
+                    ' hlist.background {} hlist.foreground {}'.format(BG_HLIST, FG_HLIST)  + \
+                    ' hlist.selectMode extended hlist.columns %d hlist.header 1' % (total_columns,)
+
+              
+                result_win.tixHList = tix.ScrolledHList(result_win,options=hlist_options)
+                hlist = result_win.tixHList.hlist
+                
+                
+                
+                hlist = result_win.tixHList.hlist
+
+                for column_name in columns:
+                    header_number = columns.index(column_name)
+                    hlist.header_create(header_number, itemtype = tix.TEXT, text = column_name,
+                                        headerbackground = BG_HLIST)
+                    #column_width = get_column_width(column_name)
+                    column_width = 50
+                    hlist.column_width(header_number, chars = column_width)
+
+                    
+                result_win.tixHList.pack(expand=1,fill=tix.BOTH,
+                                          padx=10,pady=10,side=tix.TOP) 
+
+
+                for row_num, row in enumerate(rows):   
+                    hlist.add(row_num,itemtype=tix.TEXT,text=row[0])
+                    for col_num, column in enumerate(row):
+                        hlist.item_create(row_num,col_num,itemtype=tix.TEXT,text=column)
+                 
+                result_win.mainloop()
+            else:
+                title = 'No Rows Returned'
+                message = 'No rows returned for SQL statement: \n{} '\
+                         .format(sql_stmt)
+                print(message, sql_stmt)
+                messagebox.showerror(title=title, message=message)
+                
+        except sqlite3.Error as err: 
+            title = 'SQLite3 Error'
+            message = 'SQL Error Message: \n{} '\
+                     .format(err.args[0]) + '\n' +\
+                     'for SQL statement:  \n {}'.format(sql_stmt)
+            display_sql_error(err, sql_stmt, function=None)
+            
+
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #        select_audio_file
@@ -2156,20 +2891,30 @@ class AudioMgr():
             Opens a file dialog box to select an audio file for a new
           audio file or replace an audio file for an existing entry.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+            
         # Get the widget that triggered the event and its displayed text.
         widget = event.widget
         audio_file_name = widget.get()
-        print(f'Widget name = {widget.widgetName} Audio file = {audio_file_name}')
+        if DEBUG:
+            print(f'Widget name = {widget.widgetName} Audio file = {audio_file_name}')
 
         filepath = \
           filedialog.askopenfilename(initialdir="Media",
                                      filetypes=(("Mp3 files", "*.mp3")
                                                 , ("HTML files", "*.html;*.htm")
                                                 , ("All files", "*.*")))
-        print(filepath)
+        if DEBUG:
+            print(filepath)
         audio_file_name = os.path.split(filepath)[1]
-        print(audio_file_name)
+        if DEBUG:
+            print(audio_file_name)
         audio_mgr.audio_file.set(audio_file_name)
+
+        if DEBUG:
+            display_function_completion(current_function)
 
     #_____________________________________
     #       step_through_audio
@@ -2182,6 +2927,11 @@ class AudioMgr():
           combobox.
            When it reaches the end of the list it loops back to the beginning.
         """
+        if DEBUG:
+            current_function = sys._getframe().f_code.co_name
+            display_function(current_function)
+
+        
         self.play_audio()
         next_index = self.audio_index.get() + 1
         if next_index < len(self.audio_list_cbo['values']):
@@ -2190,6 +2940,8 @@ class AudioMgr():
             self.audio_list_cbo.current(0)
         self.audio_list_cbo.event_generate("<<ComboboxSelected>>")
 
+        if DEBUG:
+            display_function_completion(current_function)
 
 #############################
 #           Main

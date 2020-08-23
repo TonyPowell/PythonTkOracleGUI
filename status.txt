@@ -1,0 +1,256 @@
+On branch master
+Your branch is up to date with 'origin/master'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   Media/Ha-yesod_10.html
+	modified:   Media/Ha-yesod_3.html
+	modified:   Media/lesson.css
+	modified:   hebrew_studies.db
+	modified:   hebrew_studies.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	Media/Ha-yesod-verbs.html
+	Media/Ha-yesod-verbs_bckup.html
+	Media/Ha-yesod_10_study_sheet.html
+	Media/Ha-yesod_10_test.html
+	Media/Ha-yesod_11.html
+	Media/Ha-yesod_11_study_sheet.html
+	Media/Ha-yesod_12_study_sheet.html
+	Media/Ha-yesod_13_study_sheet.html
+	Media/Ha-yesod_14_study_sheet.html
+	Media/Ha-yesod_1_test.html
+	Media/Ha-yesod_2_study_sheet.html
+	Media/Ha-yesod_2_test.html
+	Media/Ha-yesod_3_study_sheet.html
+	Media/Ha-yesod_3_test.html
+	Media/Ha-yesod_4_study_sheet.html
+	Media/Ha-yesod_4_test.html
+	Media/Ha-yesod_5_study_sheet.html
+	Media/Ha-yesod_5_test.html
+	Media/Ha-yesod_6_study_sheet.html
+	Media/Ha-yesod_6_test.html
+	Media/Ha-yesod_7_study_sheet.html
+	Media/Ha-yesod_7_test.html
+	Media/Ha-yesod_8_study_sheet.html
+	Media/Ha-yesod_8_test.html
+	Media/Ha-yesod_9_study_sheet.html
+	Media/Ha-yesod_9_test.html
+	"Media/How_much_does_it_cost_he_\327\233\327\236\327\224_\327\226\327\224_\327\242\327\225\327\234\327\224.mp3"
+	"Media/I_am_fine_forvo_noamko_he_\327\221\327\241\327\223\327\250_\327\222\327\236\327\225\327\250.mp3"
+	"Media/Sinai_forvo_achmo_he_\327\241\327\231\327\240\327\231.mp3"
+	"Media/answers_f_p_forvo_FrielleAridman_he_\327\242\327\225\327\240\327\225\327\252.mp3"
+	"Media/answers_f_s_forvo_nikitajy_he_\327\242\327\225\327\240\327\224.mp3"
+	"Media/answers_m_p_forvo_FrielleAridman_he_\327\242\327\225\327\240\327\231\327\235.mp3"
+	"Media/asks_f_p_forvo_ PupsGesicht _he_\327\251\327\225\327\220\327\234\327\225\327\252.mp3"
+	"Media/asks_f_s_forvo_noamika_he_\327\251\327\225\327\220\327\234\327\252.mp3"
+	"Media/asks_m_p_forvo_noamika_he_\327\251\327\225\327\220\327\234\327\231\327\235.mp3"
+	"Media/before_noon_forvo_inbal_he_\327\234\327\244\327\240\327\231_\327\224\327\246\327\224\327\250\327\231\327\231\327\235.mp3"
+	"Media/behind_forvo_markuslebt_he_\327\236\327\220\327\227\327\225\327\250\327\231.mp3"
+	Media/body_parts_study_sheet.html
+	"Media/bus_forvo_arnon_1_he_\327\220\327\225\327\230\327\225\327\221\327\225\327\241.mp3"
+	"Media/buys_f_p_forvo_shirael_he_\327\247\327\225\327\240\327\225\327\252.mp3"
+	"Media/buys_f_s_forvo_shirael_he_\327\240)_\327\247\327\225\327\240\327\224).mp3"
+	"Media/buys_m_p_forvo_shirael_he_\327\247\327\225\327\240\327\231\327\235.mp3"
+	"Media/can_v_forvo_ShimonB_he_\327\231\327\233\327\234.mp3"
+	"Media/closes_f_p_forvo_ milmanyam_he_\327\241\327\225\327\222\327\250\327\225\327\252.mp3"
+	"Media/closes_f_s_forvo_milmanyam_he_\327\241\327\225\327\222\327\250\327\252.mp3"
+	"Media/closes_m_p_forvo_milmanyam_he_\327\241\327\225\327\222\327\250\327\231\327\235.mp3"
+	"Media/comes_f_p_forvo_dianada_he_\327\221\327\220\327\225\327\252.mp3"
+	"Media/comes_f_s_forvo_FrielleAridman_he_\327\221\327\220\327\224.mp3"
+	"Media/comes_m_p_forvo_dizinteria_he_\327\221\327\220\327\231\327\235.mp3"
+	"Media/daughter_forvo_achmo_he_\327\221\327\252.mp3"
+	"Media/doctor_forvo_Dror_R_S_he_\327\250\327\225\327\244\327\220.mp3"
+	"Media/does_f_p_forvo_ZiemniaK_he_\327\242\327\225\327\251\327\225\327\252.mp3"
+	"Media/does_m_p_forvo_wildernesscat_he_\327\242\327\225\327\251\327\231\327\235.mp3"
+	"Media/eats_f_p_forvo_zorbama_he_\327\220\327\225\327\233\327\234\327\225\327\252.mp3"
+	"Media/eats_f_s_forvo_ elromulous_he_\327\220\327\225\327\233\327\234\327\252.mp3"
+	"Media/eats_m_p_forvo_zorbama_he_\327\220\327\225\327\233\327\234\327\231\327\235.mp3"
+	"Media/eight_forvo_FrielleAridman_he_\327\251\327\236\327\225\327\240\327\224.mp3"
+	"Media/eighteen_forvo_linquist823_he_\327\251\327\236\327\225\327\240\327\224_\327\242\327\251\327\250\327\224.mp3"
+	Media/electronics_study_sheet.html
+	"Media/eleven_forvo_inbal_he_\327\220\327\227\327\252-\327\242\327\251\327\250\327\224.mp3"
+	"Media/eleven_forvo_iwarshavsky_he_\327\220\327\227\327\223_\327\242\327\251\327\250.mp3"
+	"Media/falls_f_p_forvo_liatpl_he_\327\240\327\225\327\244\327\234\327\225\327\252.mp3"
+	"Media/falls_f_s_forvo_ sloew00_he_\327\240\327\225\327\244\327\234\327\252.mp3"
+	"Media/falls_forvo_oraton_he_\327\240\327\225\327\244\327\234.mp3"
+	"Media/falls_m_p_forvo_noamika_he_\327\240\327\225\327\244\327\234\327\231\327\235.mp3"
+	"Media/few_adv_forvo_elromulous_he_\327\236\327\242\327\230.mp3"
+	"Media/fifteen_forvo_0sarah0_he_\327\227\327\236\327\251_\327\242\327\251\327\250\327\224.mp3"
+	"Media/five_forvo_achmo_he_\327\227\327\236\327\251.mp3"
+	"Media/four_forvo_achmo_he_\327\220\327\250\327\221\327\242.mp3"
+	"Media/fourteen_forvo_maxck1012_he_\327\220\327\250\327\221\327\242_\327\242\327\251\327\250\327\224.mp3"
+	"Media/full_of_f_forvo_noamika_he_\327\236\327\234\327\220\327\224.mp3"
+	"Media/gets_up_f_p_forvo_ Kotztanier_he_\327\247\327\236\327\225\327\252.mp3"
+	"Media/gets_up_f_s_forvo_achmo_he_\327\247\327\236\327\224.mp3"
+	"Media/gets_up_forvo_achmo_he_\327\247\327\235.mp3"
+	"Media/gives_f_s_and_f_p_forvo_ShimonB_he_\327\224\327\223\327\242\327\252_\327\240\327\225\327\252\327\240\327\252.mp3"
+	"Media/goes_f_p_forvo_korra_he_\327\224\327\225\327\234\327\233\327\225\327\252.mp3"
+	"Media/goes_f_s_forvo_iwarshavsky_he_\327\224\327\225\327\234\327\233\327\252.mp3"
+	"Media/goes_m_p_forvo_ ZiemniaK_he_\327\224\327\225\327\234\327\233\327\231\327\235.mp3"
+	"Media/goes_out_f_p_ iwarshavsky_he_\327\231\327\225\327\246\327\220\327\225\327\252.mp3"
+	"Media/goes_out_f_s_forvo_noamika_he_\327\231\327\225\327\246\327\220\327\252.mp3"
+	"Media/goes_out_forvo_guys_he_\327\231\327\225\327\246\327\220.mp3"
+	"Media/goes_out_forvo_markuslebt_he_\327\231\327\225\327\246\327\220.mp3"
+	"Media/goes_out_m_p_forvo_markuslebt_he_\327\231\327\225\327\246\327\220\327\231\327\235.mp3"
+	"Media/goes_up_forvo_yoshevvchoshevn_he_\327\242\327\225\327\234\327\224.mp3"
+	"Media/goes_up_m_p_forvo_markuslebt_he_\327\242\327\225\327\234\327\231\327\235.mp3"
+	"Media/golden_calf_forvo_noamika_he_\327\242\327\222\327\234_\327\224\327\226\327\224\327\221.mp3"
+	"Media/government_forvo_inbal_he_\327\236\327\236\327\251\327\234\327\224.mp3"
+	Media/grammar_verbs.html
+	Media/grammar_verbs_bckup.html
+	Media/grammar_verbs_orig.html
+	"Media/great_forvo_achmo_he_\327\240\327\224\327\223\327\250.mp3"
+	"Media/hears_f_p_forvo_shirael_he_\327\251\327\225\327\236\327\242\327\225\327\252.mp3"
+	"Media/hears_f_s_forvo_shirael_he_\327\251\327\225\327\236\327\242\327\252.mp3"
+	"Media/hears_m_p_forvo_shirael_he_\327\251\327\225\327\236\327\242\327\231\327\235.mp3"
+	Media/hebrew.css
+	Media/hebrew.js
+	Media/hebrew_radical_symbol.png
+	"Media/history_forvo_achmo_he_\327\224\327\231\327\241\327\230\327\225\327\250\327\231\327\224.mp3"
+	Media/house_study_sheet.html
+	"Media/how_are_you_forvo_silhouette_he_\327\236\327\224_\327\251\327\234\327\225\327\236\327\232.mp3"
+	"Media/hungry_f_p_forvo_inbal_he_\327\250\327\242\327\221\327\225\327\252.mp3"
+	"Media/hungry_m_p_forvo_inbal_he_\327\246\327\236\327\220\327\231\327\235.mp3"
+	"Media/hungry_m_p_forvo_inbal_he_\327\250\327\242\327\221\327\231\327\235.mp3"
+	"Media/hungry_m_s_forvo_ran_dog_he_\327\250\327\242\327\221.mp3"
+	"Media/knows_f_p_forvo_PeggyMuppet_he_\327\231\327\225\327\223\327\242\327\225\327\252.mp3"
+	"Media/knows_f_s_forvo_PupsGesicht_he_\327\231\327\225\327\223\327\242\327\252.mp3"
+	"Media/knows_m_p_forvo_noamika_he_\327\231\327\225\327\223\327\242\327\231\327\235.mp3"
+	"Media/laughs_f_forvo_FrielleAridmann_he_\327\246\327\225\327\227\327\247\327\252.mp3"
+	"Media/laughs_f_p_yoramgalili_he_\327\246\327\225\327\227\327\247\327\225\327\252.mp3"
+	"Media/laughs_f_s_forvo_FrielleAridman_he_\327\246\327\225\327\227\327\247\327\252.mp3"
+	"Media/laughs_m_p_forvo_yoramgalili_he_\327\246\327\225\327\227\327\247\327\231\327\235.mp3"
+	"Media/learns_f_p_forvo_FrielleAridman_he_\327\234\327\225\327\236\327\223\327\225\327\252.mp3"
+	"Media/learns_m_p_forvo_ ZiemniaK_he_\327\234\327\225\327\236\327\223\327\231\327\235.mp3"
+	"Media/lives_f_p_forvo_tasgiv_he_\327\227\327\231\327\225\327\252.mp3"
+	"Media/lives_f_s_forvo_mic2011_he_\327\227\327\231\327\224.mp3"
+	"Media/lives_m_p_forvo_achmo_he_\327\227\327\231\327\231\327\235.mp3"
+	"Media/loves_f_p_forvo_sorbama_he_\327\220\327\225\327\224\327\221\327\225\327\252.mp3"
+	"Media/loves_f_s_forvo_sorbama_he_\327\220\327\225\327\224\327\221\327\252.mp3"
+	"Media/loves_m_p_forvo_karheil_he_\327\220\327\225\327\224\327\221\327\231\327\235.mp3"
+	"Media/meets_f_p_forvo_ FrielleAridman_he_\327\244\327\225\327\222\327\251\327\225\327\252.mp3"
+	"Media/meets_m_p_forvo_Dror_R_S_he_\327\244\327\225\327\222\327\251\327\231\327\235.mp3"
+	"Media/military_forvo_ahuva_he_\327\246\327\221\327\220\327\231.mp3"
+	"Media/movie_theater_forvo_shirael_he_\327\247\327\225\327\234\327\240\327\225\327\242.mp3"
+	"Media/music_forvo_FrielleAridman_he_\327\236\327\225\327\241\327\231\327\247\327\224.mp3"
+	"Media/music_forvo_achmo_he_\327\236\327\225\327\226\327\231\327\247\327\224.mp3"
+	"Media/needs_f_p_forvo_ FredrikMH_he_\327\246\327\250\327\231\327\233\327\225\327\252.mp3"
+	"Media/needs_f_s_forvo_ iwarshavsky_he_\327\246\327\250\327\231\327\233\327\224.mp3"
+	"Media/needs_m_p_forvo_noamika_he_\327\246\327\250\327\231\327\233\327\231\327\235.mp3"
+	"Media/nice_f_forvo_ShimonB_he_\327\240\327\227\327\236\327\223\327\224.mp3"
+	"Media/nice_forvo_PupGeischt_he_\327\240\327\227\327\236\327\223.mp3"
+	"Media/nine_forvo_achmo_he_\327\252\327\251\327\242.mp3"
+	"Media/nineteen_forvo_iwarshavsky_he_\327\252\327\251\327\242_\327\242\327\251\327\250\327\224.mp3"
+	Media/numbers_study_sheet.html
+	"Media/one_forvo_achmo_he_\327\220\327\227\327\252.mp3"
+	"Media/opens_f_p_forvo_tasgiv_he_\327\244\327\225\327\252\327\227\327\225\327\252.mp3"
+	"Media/opens_f_s_forvo_ShimonB_he_\327\244\327\225\327\252\327\227\327\252.mp3"
+	"Media/opens_m_p_forvo_idanbarir_he_\327\244\327\225\327\252\327\227\327\231\327\235.mp3"
+	"Media/outside_forvo_matfish2__he_\327\221\327\227\327\225\327\245.mp3"
+	Media/paal_present_tense.png
+	Media/paal_present_tense_2.png
+	Media/paal_present_tense_2nd_radical_guttural.png
+	Media/paal_present_tense_3rd_radical_aleph.png
+	Media/paal_present_tense_3rd_radical_heh.png
+	Media/paal_present_tense_3rd_radical_het_or_ayin.png
+	Media/paal_present_tense_stative.png
+	Media/paal_presenty_tense.png
+	"Media/paper_forvo_noamika_he_\327\240\327\231\327\231\327\250.mp3"
+	"Media/passes_crosses_forovo_noamika_he_\327\242\327\225\327\221\327\250.mp3"
+	"Media/passes_f_p_forvo_yoramgalili_he_\327\242\327\225\327\221\327\250\327\225\327\252.mp3"
+	"Media/passes_f_s_forvo_noamika_he_\327\242\327\225\327\221\327\250\327\252.mp3"
+	"Media/passes_m_p_forvo_yoramgalili_he_\327\242\327\225\327\221\327\250\327\231\327\235.mp3"
+	"Media/plays_forvo_noamika_he_\327\236\327\251\327\227\327\247_\327\236\326\260\327\251\326\267\327\202\327\227\326\265\327\247.mp3"
+	"Media/pleased_to_meet_you_forvo_WilhelmBR_he_\327\240\327\242\327\231\327\235_\327\236\327\220\327\225\327\223!.mp3"
+	"Media/police_forvo_achmo_he_\327\236\327\251\327\230\327\250\327\224.mp3"
+	"Media/puts_f_p_PupsGesicht_he_\327\251\327\236\327\225\327\252.mp3"
+	"Media/puts_f_s_noamika_\327\251\327\202\326\270\327\236\326\270\327\224_he_\327\251\327\236\327\224,_\327\251\327\201\326\267\327\236\326\274\326\270\327\224.mp3"
+	"Media/reads_f_p_forvo_noamika_he_\327\247\327\225\327\250\327\220\327\225\327\252.mp3"
+	"Media/reads_f_s_forvo_inbal_he_\327\247\327\225\327\250\327\220\327\252.mp3"
+	"Media/reads_m_p_forvo_FrielleAridman_he_\327\247\327\225\327\250\327\220\327\231\327\235.mp3"
+	"Media/religion_forvo_achmo_he_\327\223\327\252(1).mp3"
+	"Media/road_way_forvo_noamika_he_\327\223\327\250\327\232_(\327\223\326\274\326\266\327\250\326\266\327\232\326\260).mp3"
+	"Media/runs_f_p_forvo_FrielleAridman_he_\327\250\327\246\327\225\327\252.mp3"
+	"Media/runs_forvo_katia2303_he_\327\250\327\245.mp3"
+	"Media/runs_m_p_forvo_noamika_he_\327\250\327\246\327\231\327\235.mp3"
+	"Media/says_f_p_forvo_dianada_he_\327\220\327\225\327\236\327\250\327\225\327\252.mp3"
+	"Media/says_f_s_forvo_markuslebt_he_\327\220\327\225\327\236\327\250\327\252.mp3"
+	"Media/says_m_p_forvo_markuslebt_he_\327\220\327\225\327\236\327\250\327\231\327\235.mp3"
+	"Media/season_forvo_nikitajy_he_\327\242\327\225\327\240\327\224_(season).mp3"
+	"Media/see_you_later_forvo_noamika_he_\327\234\327\224\327\252\327\250\327\220\327\225\327\252.mp3"
+	"Media/sees_f_p_forvo_inbal_he_\327\250\327\225\327\220\327\225\327\252.mp3"
+	"Media/sees_m_p_forvo_noamika_he_\327\250\327\225\327\220\327\231\327\235.mp3"
+	"Media/sets_sinks_forov_Dror_R_S_he_\327\251\327\225\327\247\327\242.mp3"
+	"Media/seven_forvo_achmo_he_\327\251\327\221\327\242.mp3"
+	"Media/seventeen_forvo_Gargel_he_\327\251\327\221\327\242_\327\242\327\251\327\250\327\224.mp3"
+	"Media/sings_f_p_forvo_ ZiemniaK_he_\327\251\327\250\327\225\327\252.mp3"
+	"Media/sings_forvo_PeggyMuppet_he_\327\251\327\250.mp3"
+	"Media/sings_m_p_forvo_0sarah0_he_\327\251\327\250\327\231\327\235.mp3"
+	"Media/sinks_f_s_forvo_noamika_he_\327\251\327\225\327\247\327\242\327\252.mp3"
+	"Media/sits_f_p_forvo_tasgiv_he_\327\231\327\225\327\251\327\221\327\225\327\252.mp3"
+	"Media/sits_f_s_forvo_liouboffhe_\327\231\327\225\327\251\327\221\327\252.mp3"
+	"Media/sits_m_p_forvo_tasgiv_he_\327\231\327\225\327\251\327\221\327\231\327\235.mp3"
+	"Media/six_forvo_achmo_he_\327\251\327\251.mp3"
+	"Media/sixteen_forvo_Limoor_he_\327\251\327\251_\327\242\327\251\327\250\327\224.mp3"
+	"Media/so much_forvo_asole_he_\327\233\327\234_\327\233\327\232.mp3"
+	"Media/son_forvo_liouboff_he_\327\221\327\237.mp3"
+	"Media/stands_f_p_forvo_hava_l_he_\327\242\327\225\327\236\327\223\327\225\327\252.mp3"
+	"Media/stands_f_s_forvo_ hava_l_he_\327\242\327\225\327\236\327\223\327\252.mp3"
+	"Media/stands_m_p_forvo_noamika_he_\327\242\327\225\327\236\327\223\327\231\327\235.mp3"
+	"Media/still_else_forvo_silhouette_he_\327\242\327\225\327\223.mp3"
+	"Media/takes_f_p_forvo_dianada_he_\327\234\327\225\327\247\327\227\327\225\327\252.mp3"
+	"Media/takes_f_s_forvo_SkyElf_he_\327\234\327\225\327\247\327\227\327\252.mp3"
+	"Media/takes_m_p_forvo_PeggyMuppet_he_\327\234\327\225\327\247\327\227\327\231\327\235.mp3"
+	"Media/ten_forvo_achmo_he_\327\242\327\251\327\250.mp3"
+	Media/test_table.html
+	"Media/thank_you_very_much_forvo_achmo_he_\327\252\327\225\327\223\327\224_\327\250\327\221\327\224.mp3"
+	"Media/the_school_forvo_noamika_he_\327\221\327\231\327\252_\327\224\327\241\327\244\327\250.mp3"
+	"Media/thinks_f_p_forvo_FrielleAridman_he_\327\227\327\225\327\251\327\221\327\225\327\252.mp3"
+	"Media/thinks_f_s_forvo_noamika_he_\327\227\327\225\327\251\327\221\327\252.mp3"
+	"Media/thinks_m_p_forvo_FrielleAridman_he_\327\227\327\225\327\251\327\221\327\231\327\235.mp3"
+	"Media/thirsty_f_p_forvo_inbal_he_\327\246\327\236\327\220\327\225\327\252.mp3"
+	"Media/thirsty_f_s_forvo_ FrielleAridman_he_\327\246\327\236\327\220\327\224.mp3"
+	"Media/thirteen_forvo_iwarshavsky_he_\327\251\327\234\327\225\327\251_\327\242\327\251\327\250\327\224.mp3"
+	"Media/three_forvo_achmo_he_\327\251\327\234\327\225\327\251.mp3"
+	"Media/tired_f_p_forvo_achmohe_\327\242\327\231\327\244\327\225\327\252.mp3"
+	"Media/tired_f_s_forvo_achmo_he_\327\242\327\231\327\244\327\224.mp3"
+	"Media/to_be_forvo_achmo_he_\327\234\327\224\327\231\327\225\327\252.mp3"
+	"Media/to_hear_forvo_achmo_he_\327\234\327\251\327\236\327\225\327\242.mp3"
+	"Media/to_learn_forvo_silhoutte_he_\327\234\327\234\327\236\327\225\327\223.mp3"
+	"Media/to_read_forvo_Glorcky_he_\327\234\327\247\327\250\327\225\327\220.mp3"
+	"Media/to_say_forvo_noamika_he_\327\234\327\225\327\236\327\250.mp3"
+	"Media/to_sing_forvo_silhouette_he_\327\234\327\251\327\231\327\250.mp3"
+	"Media/to_sit_forvo_noamika_he_\327\234\327\251\327\221\327\252.mp3"
+	"Media/to_stand_forvo_odedee_he_\327\234\327\242\327\236\327\225\327\223.mp3"
+	"Media/to_tell_forvo_noamika_he_\327\234\327\241\327\244\327\250.mp3"
+	"Media/to_think_forvo_achmo_he_\327\234\327\227\327\251\327\225\327\221.mp3"
+	"Media/to_work_forvo_achmo_he_\327\234\327\242\327\221\327\225\327\223.mp3"
+	"Media/tow_forvo_achmo_he_\327\251\327\252\327\231\327\231\327\235.mp3"
+	"Media/twelve_forvo_iwarshavsky_he_\327\251\327\252\327\231\327\235_\327\242\327\251\327\250\327\224.mp3"
+	"Media/twentyforvo_markuslebt_he_\327\242\327\251\327\250\327\231\327\235.mp3"
+	"Media/two_forvo_achmo_he_\327\251\327\252\327\231\327\231\327\235.mp3"
+	"Media/university_forv_noamika_he_\327\220\327\225\327\240\327\231\327\221\327\250\327\241\327\231\327\230\327\224.mp3"
+	Media/verbs_study_sheet.html
+	Media/vocabulary.html
+	"Media/wants_f_p_forvo_achmo_he_\327\250\327\225\327\246\327\225\327\252.mp3"
+	"Media/wants_forvo_shirael_he_\327\250\327\225\327\246\327\224.mp3"
+	"Media/wants_m_p_forvo_achmo_he_\327\250\327\225\327\246\327\231\327\235.mp3"
+	"Media/where_forvo_markuslebt_he_\327\220\327\231\327\244\327\224.mp3"
+	"Media/works_f_p_forvo_sagieori_he_\327\242\327\225\327\221\327\223\327\225\327\252.mp3"
+	"Media/works_f_s_forvo_inbal_he_\327\242\327\225\327\221\327\223\327\252.mp3"
+	"Media/works_m_p_forvo_ PupsGesicht_he_\327\242\327\225\327\221\327\223\327\231\327\235.mp3"
+	"Media/writes_f_p_forvo_zorbama_he_\327\233\327\225\327\252\327\221\327\225\327\252.mp3"
+	"Media/writes_f_s_forvo_ PupsGesicht_he_\327\233\327\225\327\252\327\221\327\252.mp3"
+	"Media/writes_m_p_forvo_zorbama_he_\327\233\327\225\327\252\327\221\327\231\327\235.mp3"
+	"Media/zero_forvo_flocsy_he_\327\220\327\244\327\241.mp3"
+	hebrew_studies.txt
+	refresh3.png
+	refresh4.png
+	status.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")

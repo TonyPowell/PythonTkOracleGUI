@@ -25,3 +25,7 @@ pre {
   font-size:32px;
 	
 }
+
+<?PHP
+  $_POST['fieldname'] = strtoupper($_POST['fieldname']);
+?>

@@ -1,0 +1,18 @@
+ Added the connect_to_db_btn button and the display_sql_window and run_sql
+functions to enter SQL statements and run them against the Hebrew database.
+ Added the database_btn to envoke a SQLite3 shell. 
+ Added the tables_btn to display the table definitions in the database.
+ Added the function create_html_study_sheet which creates a vocabulary sheet
+for lessons and categories and test sheets that display either the Hebrew or 
+English vocabulary and allows the entrance of either English or Hebrew text
+translations of the displayed text.
+ Added the Javascript file hebrew.js that includes the function convertTextToHebrew
+that transliterates the English character keyboard input to Hebrew characters.
+ Updated the hebrew.css file and added the classes english_input, english_text,
+hebrew_input, hebrew_text, row_odd, row_even and classes for all the cursor options.
+ Added Ha-yesod_verbs.html that lists all the verbs in the lessons with audio if
+available..
+ Added grammar_verbs.html that the lists the different verb conjugations with examples
+from the lessons with audio if available.
+
+
